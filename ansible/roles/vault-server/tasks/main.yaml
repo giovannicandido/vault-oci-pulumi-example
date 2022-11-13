@@ -1,0 +1,69 @@
+---
+- name: install required software
+  ansible.builtin.yum:
+    name:
+      - chrony
+      - httpd
+      - socat
+      - yum-utils
+      - ca-certificates
+    state: present
+- name: install oci-cli python module
+  ansible.builtin.pip:
+    name: oci-cli
+
+- name: configure firewalld vault port
+  ansible.posix.firewalld:
+    port: 8200/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
+  notify: restart firewalld
+- name: add hashicorp vault repository
+  ansible.builtin.shell:
+    cmd: yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo 
+  args:
+    creates: /etc/yum.repos.d/hashicorp.repo
+- name: install hashicorp vault
+  ansible.builtin.yum:
+    name: vault-1.11.4-1
+    state: present
+- name: config vault.hcl
+  ansible.builtin.template:
+    src: ../templates/vault.hcl
+    dest: /etc/vault.d/vault.hcl
+    owner: vault
+    group: vault
+    mode: '0640'
+  notify: restart vault
+- name: create certificates directory
+  ansible.builtin.file:
+    path: /etc/vault-certificates
+    owner: vault
+    group: vault
+    state: directory
+- name: add certificates
+  ansible.builtin.copy:
+    dest: /etc/vault-certificates/
+    src: ../files/{{ item }}
+    owner: vault
+    group: vault
+    mode: u+rw,g-wx,o-rwx
+  with_items:
+    - vault.key
+    - vault-chain.pem
+    - vault.pem
+  notify: restart vault
+- name: trust ca certificate
+  ansible.builtin.shell:  update-ca-trust force-enable
+- name: trust ca certificate
+  ansible.builtin.copy:
+    dest: /etc/pki/ca-trust/source/anchors/
+    src: ../files/vault-chain.pem
+- name: trust ca certificate
+  ansible.builtin.shell: update-ca-trust extract
+- name: enable vault service
+  ansible.builtin.service:
+    name: vault
+    state: started
+    enabled: yes

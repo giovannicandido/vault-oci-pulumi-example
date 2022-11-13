@@ -1,0 +1,6 @@
+name: vault-installation
+description: Vault Installation in Oracle Cloud Infrastructure
+runtime:
+  name: nodejs
+  options:
+    nodeargs: "--loader ts-node/esm --no-warnings"

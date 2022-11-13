@@ -1,0 +1,5 @@
+vault-servers:
+  hosts:
+    vault-0:
+      ansible_host: 193.123.110.94
+      ansible_user: opc

@@ -1,0 +1,13 @@
+config:
+  oci:region: sa-vinhedo-1
+  oci:tenancyOcid:
+    secure: 
+  vault-installation:bucketNamespace: 
+  vault-installation:compartmentId:
+    secure: 
+  vault-installation:region: sa-vinhedo-1
+  vault-installation:rootCompartmentId:
+    secure: 
+  vault-installation:ssh-pub-key: 
+  vault-installation:tenancyOcid:
+    secure:

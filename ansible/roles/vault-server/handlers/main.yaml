@@ -1,0 +1,8 @@
+- name: restart firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: restarted
+- name: restart vault
+  ansible.builtin.service:
+    name: vault
+    state: restarted
